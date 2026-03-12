@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:ma_visualization/Provider/RemainTableProvider.dart';
-import 'package:ma_visualization/Provider/RepairFeeDailyProvider.dart';
 import 'package:provider/provider.dart';
 
 import 'Provider/DateProvider.dart';
 import 'Provider/RemainChartProvider.dart';
-import 'Provider/RepairFeeProvider.dart';
 import 'Routes/GoRouter.dart';
 
 void main() {
@@ -14,8 +12,6 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => RemainTableProvider()),
         ChangeNotifierProvider(create: (_) => RemainChartProvider()),
-        ChangeNotifierProvider(create: (_) => RepairFeeProvider()),
-        ChangeNotifierProvider(create: (_) => RepairFeeDailyProvider()),
 
         ChangeNotifierProvider(create: (_) => DateProvider()),
       ],

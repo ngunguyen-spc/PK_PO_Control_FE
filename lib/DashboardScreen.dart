@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:ma_visualization/Common/OverviewCard.dart';
 import 'package:ma_visualization/Provider/DateProvider.dart';
-import 'package:ma_visualization/Provider/RepairFeeProvider.dart';
 import 'package:ma_visualization/Remain_Table/RemainTableScreen.dart';
 import 'package:ma_visualization/Remain_Chart/RemainChartScreen.dart';
 import 'package:provider/provider.dart';
 
 import 'Common/CustomAppBar.dart';
-import 'RepairFee/RepairFeeOverviewScreen.dart';
 
 class DashboardScreen extends StatefulWidget {
   final VoidCallback onToggleTheme;
@@ -24,7 +22,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final dateProvider = context.watch<DateProvider>();
-    final repairFeeProvider = context.watch<RepairFeeProvider>();
+    //final repairFeeProvider = context.watch<RemainTableScreen>();
 
     return Scaffold(
       appBar: CustomAppBar(
@@ -33,7 +31,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         onDateChanged: (newDate) {
           context.read<DateProvider>().updateDate(newDate);
         },
-        currentDate: repairFeeProvider.lastFetchedDate,
+        currentDate: DateTime.now(),
         onToggleTheme: widget.onToggleTheme,
         selectedDiv: _selectedDiv,             // ✅
         onDivChanged: (div) {

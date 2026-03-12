@@ -1,33 +1,124 @@
+// import 'dart:async';
+//
+// import 'package:flutter/material.dart';
+// import 'package:ma_visualization/Model/RemainTableModel.dart';
+// import 'package:intl/intl.dart';
+// import '../API/ApiService.dart';
+//
+// class RemainTableProvider with ChangeNotifier {
+//   final ApiService _apiService = ApiService();
+//
+//   List<RemainTableModel> _data = [];
+//   DateTime? _lastLoadedDate;
+//   String? _lastLoadedDateString;
+//   String? _lastLoadedDiv;
+//   bool _isLoading = false;
+//
+//   List<RemainTableModel> get data => _data;
+//   bool get isLoading => _isLoading;
+//   RemainTableModel? selectedItem;
+//
+//   DateTime _lastFetchedDate = DateTime.now();
+//   String _currentDiv = '';  // ✅ Lưu div hiện tại cho timer
+//   Timer? _dailyTimer;
+//
+//   DateTime get lastFetchedDate => _lastFetchedDate;
+//
+//   RemainTableProvider() {
+//     _initTimer();
+//   }
+//
+//   void _initTimer() {
+//     _dailyTimer = Timer.periodic(const Duration(minutes: 60), (timer) {
+//       final now = DateTime.now();
+//       if (!_isSameDate(now, _lastFetchedDate)) {
+//         _lastFetchedDate = now;
+//         final date = DateFormat('yyyy-MM-dd').format(now);
+//         if (_currentDiv.isNotEmpty) {
+//           fetchRemainTable(_currentDiv, date); // ✅ Dùng div đã lưu
+//         }
+//       }
+//     });
+//   }
+//
+//   bool _isSameDate(DateTime a, DateTime b) =>
+//       a.year == b.year && a.month == b.month && a.day == b.day;
+//
+//   @override
+//   void dispose() {
+//     _dailyTimer?.cancel();
+//     super.dispose();
+//   }
+//
+//   Future<void> fetchRemainTable(String div, String date) async {
+//     // ✅ Cache check cả div lẫn date
+//     if (_lastLoadedDiv == div &&
+//         _lastLoadedDateString == date &&
+//         _data.isNotEmpty) return;
+//
+//     _currentDiv = div;
+//
+//     _isLoading = true;
+//     notifyListeners();
+//
+//     final result = await _apiService.fetchRemainTable(div, date);
+//
+//     _data = result;
+//     _lastLoadedDiv = div;
+//     _lastLoadedDateString = date;
+//     _isLoading = false;
+//     notifyListeners();
+//   }
+//
+//   void clearData() {
+//     _data = [];
+//     _lastLoadedDateString = null;
+//     _lastLoadedDiv = null;
+//     notifyListeners();
+//   }
+// }
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:ma_visualization/Model/RemainTableDetailModel.dart';
 import 'package:ma_visualization/Model/RemainTableModel.dart';
-import 'package:ma_visualization/Model/RepairFeeModel.dart';
 import 'package:intl/intl.dart';
 import '../API/ApiService.dart';
 
 class RemainTableProvider with ChangeNotifier {
   final ApiService _apiService = ApiService();
 
+  // ── Summary table data ────────────────────────────────────────────────────
   List<RemainTableModel> _data = [];
-  DateTime? _lastLoadedDate;
   String? _lastLoadedDateString;
   String? _lastLoadedDiv;
   bool _isLoading = false;
 
-  List<RemainTableModel> get data => _data;
-  bool get isLoading => _isLoading;
-  RemainTableModel? selectedItem;
+  List<RemainTableModel> get data       => _data;
+  bool                   get isLoading  => _isLoading;
 
+  // ── Detail cache ──────────────────────────────────────────────────────────
+  // Key: 'cusID|shipBy'  → list detail rows
+  // Key: '|'             → tất cả (dùng cho click tổng)
+  Map<String, List<RemainTableDetailModel>> _detailCache = {};
+  bool _isDetailLoading = false;
+
+  bool get isDetailLoading => _isDetailLoading;
+
+  /// Tra cache detail theo cusID + shipBy. Null nếu chưa có.
+  List<RemainTableDetailModel>? getDetail(String cusID, String shipBy) =>
+      _detailCache['$cusID|$shipBy'];
+
+  /// Toàn bộ detail (cho click ô tổng)
+  List<RemainTableDetailModel>? get allDetail => _detailCache['|'];
+
+  // ── Timer ─────────────────────────────────────────────────────────────────
   DateTime _lastFetchedDate = DateTime.now();
-  String _currentDiv = '';  // ✅ Lưu div hiện tại cho timer
-  Timer? _dailyTimer;
-
+  String   _currentDiv     = '';
+  Timer?   _dailyTimer;
   DateTime get lastFetchedDate => _lastFetchedDate;
 
-  RemainTableProvider() {
-    _initTimer();
-  }
+  RemainTableProvider() { _initTimer(); }
 
   void _initTimer() {
     _dailyTimer = Timer.periodic(const Duration(minutes: 60), (timer) {
@@ -36,7 +127,7 @@ class RemainTableProvider with ChangeNotifier {
         _lastFetchedDate = now;
         final date = DateFormat('yyyy-MM-dd').format(now);
         if (_currentDiv.isNotEmpty) {
-          fetchRemainTable(_currentDiv, date); // ✅ Dùng div đã lưu
+          fetchRemainTable(_currentDiv, date);
         }
       }
     });
@@ -51,53 +142,94 @@ class RemainTableProvider with ChangeNotifier {
     super.dispose();
   }
 
-  // Future<void> fetchRemainTable(String month) async {
-  //   final now = DateTime.now();
-  //
-  //   // Sửa điều kiện: nếu đã tải hôm nay VÀ cùng tháng thì không cần gọi lại
-  //   if (_lastLoadedDate != null &&
-  //       _lastLoadedMonth == month &&
-  //       _lastLoadedDate!.day == now.day &&
-  //       _lastLoadedDate!.month == now.month &&
-  //       _lastLoadedDate!.year == now.year) {
-  //     return;
-  //   }
-  //
-  //   _isLoading = true;
-  //   notifyListeners();
-  //
-  //   final result = await _apiService.fetchRemainTable(month);
-  //   _data = result;
-  //   _lastLoadedDate = now;
-  //   _lastLoadedMonth = month; // Cập nhật tháng
-  //
-  //   _isLoading = false;
-  //   notifyListeners();
-  // }
+  // ── Fetch summary ─────────────────────────────────────────────────────────
   Future<void> fetchRemainTable(String div, String date) async {
-    // ✅ Cache check cả div lẫn date
     if (_lastLoadedDiv == div &&
         _lastLoadedDateString == date &&
         _data.isNotEmpty) return;
 
     _currentDiv = div;
-
-    _isLoading = true;
+    _isLoading  = true;
     notifyListeners();
 
     final result = await _apiService.fetchRemainTable(div, date);
 
-    _data = result;
-    _lastLoadedDiv = div;
-    _lastLoadedDateString = date;
-    _isLoading = false;
+    _data                  = result;
+    _lastLoadedDiv         = div;
+    _lastLoadedDateString  = date;
+    _isLoading             = false;
     notifyListeners();
+
+    // ✅ Sau khi có summary → preload toàn bộ detail vào cache ngầm
+    _prefetchDetail(div, date);
   }
 
+  // ── Prefetch detail (background, không block UI) ──────────────────────────
+  Future<void> _prefetchDetail(String div, String date) async {
+    if (_isDetailLoading) return;
+    _isDetailLoading = true;
+
+    debugPrint('[Cache] Prefetching ALL detail — div=$div date=$date');
+
+    try {
+      final all = await _apiService.fetchRemainTableDetail(div, date, 'All', 'All');
+
+      final Map<String, List<RemainTableDetailModel>> grouped = {};
+      for (final row in all) {
+        final key = '\${row.cusID}|\${row.shipBy}';
+        grouped.putIfAbsent(key, () => []).add(row);
+      }
+      // Key 'All|All' = toan bo (cho click o tong)
+      grouped['All|All'] = all;
+
+      _detailCache = grouped;
+
+      debugPrint('[Cache] Prefetch done — \${all.length} rows, \${grouped.length} keys: \${grouped.keys.toList()}');
+    } catch (e) {
+      debugPrint('[Cache] Prefetch failed: \$e');
+    } finally {
+      _isDetailLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // ── Public: lay detail (cache-first, filter tu All|All) ─────────────────
+  Future<List<RemainTableDetailModel>> fetchDetail({
+    required String div,
+    required String date,
+    required String cusID,
+    required String shipBy,
+  }) async {
+    // Neu All|All da co trong cache → filter truc tiep, khong goi API
+    final allKey = 'All|All';
+    if (_detailCache.containsKey(allKey)) {
+      final all = _detailCache[allKey]!;
+
+      if (cusID == 'All' && shipBy == 'All') {
+        debugPrint('[Cache] HIT All|All (\${all.length} rows)');
+        return all;
+      }
+
+      final filtered = all
+          .where((r) => r.cusID == cusID && r.shipBy == shipBy)
+          .toList();
+      debugPrint('[Cache] HIT filter cusID=\$cusID shipBy=\$shipBy → \${filtered.length} rows');
+      return filtered;
+    }
+
+    // Cache chua san sang (prefetch dang chay) → goi API fallback
+    debugPrint('[Cache] MISS All|All → calling API  div=\$div date=\$date cusID=\$cusID shipBy=\$shipBy');
+    final result = await _apiService.fetchRemainTableDetail(div, date, cusID, shipBy);
+    debugPrint('[Cache] API returned \${result.length} rows (not stored, wait for prefetch)');
+    return result;
+  }
+
+  // ── Clear ─────────────────────────────────────────────────────────────────
   void clearData() {
-    _data = [];
+    _data                 = [];
+    _detailCache          = {};
     _lastLoadedDateString = null;
-    _lastLoadedDiv = null;
+    _lastLoadedDiv        = null;
     notifyListeners();
   }
 }
