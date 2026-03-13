@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ma_visualization/Common/OverviewCard.dart';
 import 'package:ma_visualization/Provider/DateProvider.dart';
+import 'package:ma_visualization/Provider/RemainTableProvider.dart';
 import 'package:ma_visualization/Remain_Table/RemainTableScreen.dart';
 import 'package:ma_visualization/Remain_Chart/RemainChartScreen.dart';
 import 'package:provider/provider.dart';
@@ -17,12 +18,12 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  String _selectedDiv = 'KVH'; // ✅ Mặc định KVH
+  String _selectedDiv = 'KVH';
 
   @override
   Widget build(BuildContext context) {
-    final dateProvider = context.watch<DateProvider>();
-    //final repairFeeProvider = context.watch<RemainTableScreen>();
+    final dateProvider   = context.watch<DateProvider>();
+    final remainProvider = context.watch<RemainTableProvider>();
 
     return Scaffold(
       appBar: CustomAppBar(
@@ -32,10 +33,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
           context.read<DateProvider>().updateDate(newDate);
         },
         currentDate: DateTime.now(),
+        lastLoadedTime:        remainProvider.lastLoadedTime,
+        lastReloadTriggeredAt: remainProvider.lastReloadTriggeredAt,
         onToggleTheme: widget.onToggleTheme,
-        selectedDiv: _selectedDiv,             // ✅
+        selectedDiv: _selectedDiv,
         onDivChanged: (div) {
-          setState(() => _selectedDiv = div);  // ✅ Rebuild → truyền xuống screens
+          setState(() => _selectedDiv = div);
         },
       ),
       body: Row(
@@ -44,24 +47,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: RemainTableScreen(
               onToggleTheme: widget.onToggleTheme,
               selectedDate: dateProvider.selectedDate,
-              div: _selectedDiv, // ✅ Truyền xuống
+              div: _selectedDiv,
             ),
           ),
           Column(
             children: [
               Expanded(
                 child: OverviewCard(
-                  //height: MediaQuery.of(context).size.height / 2,
                   child: RemainChartScreen(
                     onToggleTheme: widget.onToggleTheme,
                     selectedDate: dateProvider.selectedDate,
-                    div: _selectedDiv, // ✅ Truyền xuống
+                    div: _selectedDiv,
                   ),
                 ),
               ),
               Expanded(
                 child: OverviewCard(
-                  //height: MediaQuery.of(context).size.height / 2,
                   child: const Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,

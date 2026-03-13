@@ -82,7 +82,7 @@ class ApiService {
   /// REMAIN TABLE DETAILS
   Future<List<RemainTableDetailModel>> fetchRemainTableDetail(String div, String date, String cusID, String shipBy) async {
     final url = Uri.parse("$baseUrl/remain_table_detail?div=$div&date=$date&cusID=$cusID&shipBy=$shipBy");
-    print("Url remain table: $url");
+    print("Url remain table detail: $url");
     try {
       final response = await http.get(url);
 
@@ -101,9 +101,9 @@ class ApiService {
   }
 
   Future<List<RemainChartModel>> fetchRemainChart(String div, String date) async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/remain_chart?div=$div&date=$date'), // ✅ Sửa endpoint cho đúng
-    );
+    final url = Uri.parse("$baseUrl/remain_chart?div=$div&date=$date");
+    print("Url remain chart: $url");
+    final response = await http.get(url);
     if (response.statusCode == 200) {
       final List<dynamic> json = jsonDecode(response.body);
       return json.map((e) => RemainChartModel.fromJson(e)).toList();

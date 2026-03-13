@@ -9,37 +9,42 @@ class RemainChartProvider with ChangeNotifier {
 
   List<RemainChartModel> _data = [];
   String? _lastLoadedDateString;
-  String? _lastLoadedDiv; // ✅ Thêm cache div
+  String? _lastLoadedDiv;
   bool _isLoading = false;
 
-  List<RemainChartModel> get data => _data;
-  bool get isLoading => _isLoading;
+  List<RemainChartModel> get data      => _data;
+  bool                   get isLoading => _isLoading;
 
   DateTime _lastFetchedDate = DateTime.now();
-  String _currentDiv = '';  // ✅ Lưu div hiện tại cho timer
-  String _currentDate = ''; // ✅ Lưu date hiện tại cho timer
-  Timer? _dailyTimer;
+  String   _currentDiv      = '';
+  Timer?   _dailyTimer;
   DateTime get lastFetchedDate => _lastFetchedDate;
 
-  RemainChartProvider() {
-    _initTimer();
-  }
+  // Thoi gian load lan cuoi (data ve)
+  DateTime? _lastLoadedTime;
+  DateTime? get lastLoadedTime => _lastLoadedTime;
+
+  // Thoi gian timer bat (countdown chinh xac)
+  DateTime? _lastReloadTriggeredAt;
+  DateTime? get nextLoadTime =>
+      _lastReloadTriggeredAt?.add(const Duration(minutes: 1));
+
+  RemainChartProvider() { _initTimer(); }
 
   void _initTimer() {
-    _dailyTimer = Timer.periodic(const Duration(minutes: 60), (timer) {
-      final now = DateTime.now();
-      if (!_isSameDate(now, _lastFetchedDate)) {
-        _lastFetchedDate = now;
-        final date = DateFormat('yyyy-MM-dd').format(now);
-        if (_currentDiv.isNotEmpty) {
-          fetchRemainChart(_currentDiv, date); // ✅ Dùng div đã lưu
-        }
+    _dailyTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
+      final date = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      if (_currentDiv.isNotEmpty) {
+        debugPrint('[Timer] Auto-reload chart — div=$_currentDiv date=$date');
+        _lastReloadTriggeredAt = DateTime.now();
+        // Reset cache check de force fetch, KHONG clearData tranh UI nhay
+        _lastLoadedDateString = null;
+        _lastLoadedDiv        = null;
+        notifyListeners(); // cap nhat nextLoadTime ngay lap tuc
+        fetchRemainChart(_currentDiv, date);
       }
     });
-    }
-
-  bool _isSameDate(DateTime a, DateTime b) =>
-      a.year == b.year && a.month == b.month && a.day == b.day;
+  }
 
   @override
   void dispose() {
@@ -48,28 +53,28 @@ class RemainChartProvider with ChangeNotifier {
   }
 
   Future<void> fetchRemainChart(String div, String date) async {
-    // Nếu cùng date thì không gọi lại
     if (_lastLoadedDiv == div &&
         _lastLoadedDateString == date &&
         _data.isNotEmpty) return;
 
-    _isLoading = true;
+    _currentDiv = div;
+    _isLoading  = true;
     notifyListeners();
 
-    // ✅ Gọi API riêng cho chart — truyền date, backend tính -7/+24
     final result = await _apiService.fetchRemainChart(div, date);
 
-    _data = result;
-    _lastLoadedDiv = div;
+    _data                 = result;
+    _lastLoadedDiv        = div;
     _lastLoadedDateString = date;
-    _isLoading = false;
+    _isLoading            = false;
+    _lastLoadedTime       = DateTime.now();
     notifyListeners();
   }
 
   void clearData() {
-    _data = [];
+    _data                 = [];
     _lastLoadedDateString = null;
-    _lastLoadedDiv = null;
+    _lastLoadedDiv        = null;
     notifyListeners();
   }
 }
