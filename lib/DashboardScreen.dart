@@ -7,6 +7,7 @@ import 'package:ma_visualization/Remain_Chart/RemainChartScreen.dart';
 import 'package:provider/provider.dart';
 
 import 'Common/CustomAppBar.dart';
+import 'PickupTimeline/PickupTimelineScreen.dart';
 
 class DashboardScreen extends StatefulWidget {
   final VoidCallback onToggleTheme;
@@ -61,18 +62,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
               ),
+              // Expanded(
+              //   child: OverviewCard(
+              //     child: const Center(
+              //       child: Column(
+              //         mainAxisSize: MainAxisSize.min,
+              //         children: [
+              //           Icon(Icons.construction, size: 48, color: Colors.grey),
+              //           SizedBox(height: 12),
+              //           Text('Coming Soon',
+              //               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey)),
+              //         ],
+              //       ),
+              //     ),
+              //   ),
+              // ),
               Expanded(
                 child: OverviewCard(
-                  child: const Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.construction, size: 48, color: Colors.grey),
-                        SizedBox(height: 12),
-                        Text('Coming Soon',
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey)),
-                      ],
-                    ),
+                  child: PickupTimelineScreen(
+                    onToggleTheme: widget.onToggleTheme,
+                    selectedDate: dateProvider.selectedDate,
+                    div: _selectedDiv,
                   ),
                 ),
               ),

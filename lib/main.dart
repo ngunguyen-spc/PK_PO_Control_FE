@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ma_visualization/Provider/PickupTimelineProvider.dart';
 import 'package:ma_visualization/Provider/RemainTableProvider.dart';
 import 'package:provider/provider.dart';
 
@@ -12,6 +13,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => RemainTableProvider()),
         ChangeNotifierProvider(create: (_) => RemainChartProvider()),
+        ChangeNotifierProvider(create: (_) => PickupTimelineProvider()),
 
         ChangeNotifierProvider(create: (_) => DateProvider()),
       ],
