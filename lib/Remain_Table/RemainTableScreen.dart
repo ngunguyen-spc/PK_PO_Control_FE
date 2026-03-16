@@ -157,7 +157,7 @@ class _RemainTableScreenState extends State<RemainTableScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(children: [
-                      TitleWithIndexBadge(index: 1, title: title),
+                      TitleWithIndexBadge(index: 2, title: title),
                       // Spinner nhỏ khi đang refresh ngầm
                       if (provider.isRefreshing) ...[
                         const SizedBox(width: 8),

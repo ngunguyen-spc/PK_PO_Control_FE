@@ -45,7 +45,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       body: Row(
         children: [
           OverviewCard(
-            child: RemainTableScreen(
+          child: PickupTimelineScreen(
+            // child: RemainTableScreen(
               onToggleTheme: widget.onToggleTheme,
               selectedDate: dateProvider.selectedDate,
               div: _selectedDiv,
@@ -55,31 +56,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
             children: [
               Expanded(
                 child: OverviewCard(
-                  child: RemainChartScreen(
+                  child: RemainTableScreen(
                     onToggleTheme: widget.onToggleTheme,
                     selectedDate: dateProvider.selectedDate,
                     div: _selectedDiv,
                   ),
                 ),
               ),
-              // Expanded(
-              //   child: OverviewCard(
-              //     child: const Center(
-              //       child: Column(
-              //         mainAxisSize: MainAxisSize.min,
-              //         children: [
-              //           Icon(Icons.construction, size: 48, color: Colors.grey),
-              //           SizedBox(height: 12),
-              //           Text('Coming Soon',
-              //               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey)),
-              //         ],
-              //       ),
-              //     ),
-              //   ),
-              // ),
               Expanded(
                 child: OverviewCard(
-                  child: PickupTimelineScreen(
+                  child: RemainChartScreen(
                     onToggleTheme: widget.onToggleTheme,
                     selectedDate: dateProvider.selectedDate,
                     div: _selectedDiv,

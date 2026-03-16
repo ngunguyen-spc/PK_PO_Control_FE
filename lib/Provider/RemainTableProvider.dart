@@ -282,7 +282,7 @@ class RemainTableProvider with ChangeNotifier {
     debugPrint('[Cache] Prefetching ALL detail — div=$div date=$date');
 
     try {
-      final all = await _apiService.fetchRemainTableDetail(div, date, 'All', 'All');
+      final all = await _apiService.fetchRemainTableDetailMTD(div, date, 'All', 'All');
 
       final Map<String, List<RemainTableDetailModel>> grouped = {};
       for (final row in all) {
@@ -329,7 +329,7 @@ class RemainTableProvider with ChangeNotifier {
 
     // Cache chua san sang (prefetch dang chay) → goi API fallback
     debugPrint('[Cache] MISS All|All → calling API  div=$div date=$date cusID=$cusID shipBy=$shipBy');
-    final result = await _apiService.fetchRemainTableDetail(div, date, cusID, shipBy);
+    final result = await _apiService.fetchRemainTableDetailMTD(div, date, cusID, shipBy);
     debugPrint('[Cache] API returned ${result.length} rows (not stored, wait for prefetch)');
     return result;
   }

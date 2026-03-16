@@ -125,8 +125,9 @@ class _RemainTableWidgetState extends State<RemainTableWidget> {
         child: DataTable(
           columnSpacing: 32,
           horizontalMargin: 24,
-          dataRowMinHeight: 28,
-          dataRowMaxHeight: 36,
+          dataRowMinHeight: 20,
+          dataRowMaxHeight: 26,
+          headingRowHeight: 32,  // ← thêm dòng này (mặc định là 56)
           sortColumnIndex: _sortColumnIndex,
           sortAscending: _sortAscending,
           columns: [
@@ -257,7 +258,7 @@ class _RemainTableWidgetState extends State<RemainTableWidget> {
                     alignment: Alignment.centerRight,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+                          horizontal: 8, vertical: 1),
                       decoration: BoxDecoration(
                         color: _getRemainColor(item.remain_PO, isDark),
                         borderRadius: BorderRadius.circular(4),
@@ -283,7 +284,7 @@ class _RemainTableWidgetState extends State<RemainTableWidget> {
                     alignment: Alignment.centerRight,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+                          horizontal: 8, vertical: 1),
                       decoration: BoxDecoration(
                         color: _getRemainColor(item.remain_Qty, isDark),
                         borderRadius: BorderRadius.circular(4),

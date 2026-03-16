@@ -147,7 +147,7 @@ class _PickupTimelineScreenState extends State<PickupTimelineScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(children: [
-                    TitleWithIndexBadge(index: 3, title: 'Pickup Timeline'),
+                    TitleWithIndexBadge(index: 1, title: 'Pickup Timeline'),
                     const SizedBox(width: 6),
                     Text(
                       DateFormat('d-MMM').format(context.read<DateProvider>().selectedDate),

@@ -190,7 +190,7 @@ class _RemainTableDetailPopupState extends State<RemainTableDetailPopup> {
       builder: (_) => const Center(child: CircularProgressIndicator()),
     );
 
-    final data = await ApiService().fetchRemainTableDetail(
+    final data = await ApiService().fetchRemainTableDetailMTD(
       widget.div,
       dateStr,
       widget.cusID,

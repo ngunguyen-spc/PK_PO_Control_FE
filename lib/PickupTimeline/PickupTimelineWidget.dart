@@ -28,7 +28,7 @@ class _PickupTimelineWidgetState extends State<PickupTimelineWidget>
 
   static const double _labelW = 145.0;
   static const double _statW = 90.0;
-  static const double _rowH = 52.0;
+  static const double _rowH = 40.0; //
   static const double _barH = 22.0;
 
   @override
@@ -163,6 +163,7 @@ class PickupTimeAxis extends StatelessWidget {
   final double labelW; // phải khớp _labelW trong Widget = 148
   final double statW; // phải khớp _statW  = 90
   final bool isDark;
+  // final Set<String> activeDays; // "yyyy-MM-dd" của các ngày có pickup
 
   const PickupTimeAxis({
     super.key,
@@ -173,6 +174,7 @@ class PickupTimeAxis extends StatelessWidget {
     required this.labelW,
     required this.statW,
     required this.isDark,
+    // this.activeDays = const {},
   });
 
   String _fmtHour(DateTime t) =>
@@ -214,7 +216,7 @@ class PickupTimeAxis extends StatelessWidget {
                   final x = pct * w;
                   final isDay = t.hour == 0 && t.minute == 0;
 
-                  // ── Row trên: d/M ─────────────────────────────────────
+                  //── Row trên: d/M ─────────────────────────────────────
                   if (isDay) {
                     dayItems.add(
                       Positioned(
@@ -408,43 +410,6 @@ class _GanttRow extends StatelessWidget {
           height: rowH,
           child: Row(
             children: [
-              // ── Label ──────────────────────────────────────────────────────
-              // SizedBox(
-              //   width: labelW,
-              //   child: Row(children: [
-              //     Container(
-              //       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-              //       decoration: BoxDecoration(
-              //           color: _shipByBg(item.shipBy),
-              //           borderRadius: BorderRadius.circular(4)),
-              //       child: Text(item.shipBy,
-              //           style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700,
-              //               color: _shipByFg(item.shipBy))),
-              //     ),
-              //     const SizedBox(width: 6),
-              //     Expanded(
-              //       child: Column(
-              //         mainAxisAlignment: MainAxisAlignment.center,
-              //         crossAxisAlignment: CrossAxisAlignment.start,
-              //         children: [
-              //           Text(item.cusID,
-              //               overflow: TextOverflow.ellipsis,
-              //               style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600,
-              //                   color: labelColor ??
-              //                       (isDark ? Colors.white : Colors.black87))),
-              //           Text(
-              //             isOverdue ? '⚠ Overdue ${minsLeft.abs()}m'
-              //                 : isUrgent ? '⚡ ${minsLeft}m left'
-              //                 : timeFmt.format(item.pickupTime),
-              //             style: TextStyle(fontSize: 12,
-              //                 color: labelColor ??
-              //                     (isDark ? Colors.grey.shade400 : Colors.grey.shade600)),
-              //           ),
-              //         ],
-              //       ),
-              //     ),
-              //   ]),
-              // ),
               SizedBox(
                 width: labelW,
                 child: Row(
@@ -456,7 +421,7 @@ class _GanttRow extends StatelessWidget {
                         item.cusID,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: 15,
                           fontWeight: FontWeight.w600,
                           color: isDark ? Colors.white : Colors.black87,
                         ),
@@ -725,7 +690,7 @@ class _DoneChip extends StatelessWidget {
           size: 13,
           color: isDark ? Colors.green.shade300 : Colors.green.shade700,
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: 12),
         Text(
           'Done',
           style: TextStyle(
@@ -774,9 +739,9 @@ class _RemainChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(6),
         border: Border.all(color: border),
       ),
-      child: Column(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             NumberFormat('#,###').format(remain.toInt()),
@@ -786,6 +751,7 @@ class _RemainChip extends StatelessWidget {
               color: textC,
             ),
           ),
+          const SizedBox(width: 4),
           Text(
             '${(pct * 100).toStringAsFixed(0)}%',
             style: TextStyle(

@@ -82,7 +82,7 @@ class PickupTimelineProvider with ChangeNotifier {
     debugPrint('[Cache] Prefetching detail — div=$div date=$date');
 
     try {
-      final all = await _apiService.fetchRemainTableDetail(div, date, 'All', 'All');
+      final all = await _apiService.fetchRemainTableDetailMTD(div, date, 'All', 'All');
 
       final Map<String, List<RemainTableDetailModel>> grouped = {};
       for (final row in all) {

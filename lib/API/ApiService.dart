@@ -101,6 +101,27 @@ class ApiService {
     }
   }
 
+  /// REMAIN TABLE DETAILS
+  Future<List<RemainTableDetailModel>> fetchRemainTableDetailMTD(String div, String date, String cusID, String shipBy) async {
+    final url = Uri.parse("$baseUrl/remain_table_detail_mtd?div=$div&date=$date&cusID=$cusID&shipBy=$shipBy");
+    print("Url remain table detail: $url");
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+
+        return data.map((json) => RemainTableDetailModel.fromJson(json)).toList();
+      } else {
+        print("Error: ${response.statusCode}");
+        return [];
+      }
+    } catch (e) {
+      print("Exception caught: $e");
+      return [];
+    }
+  }
+
   Future<List<RemainChartModel>> fetchRemainChart(String div, String date) async {
     final url = Uri.parse("$baseUrl/remain_chart?div=$div&date=$date");
     print("Url remain chart: $url");

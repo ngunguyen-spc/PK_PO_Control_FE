@@ -313,7 +313,7 @@ class _RemainChartScreenState extends State<RemainChartScreen> {
                   children: [
                     // Lề trái: Title + Date
                     Row(children: [
-                      TitleWithIndexBadge(index: 2, title: title),
+                      TitleWithIndexBadge(index: 3, title: title),
                       const SizedBox(width: 12),
                       Text(
                         '[${widget.div}]', // ✅
