@@ -585,7 +585,7 @@ class _GanttRow extends StatelessWidget {
                                           ? Colors.deepOrange.shade600
                                           : isUrgent
                                           ? Colors.red.shade500
-                                          : Colors.blue.shade400,
+                                          : Colors.deepOrange.shade300,
                                 ),
                                 Container(
                                   width: 2,
@@ -597,7 +597,7 @@ class _GanttRow extends StatelessWidget {
                                           ? Colors.deepOrange.shade600
                                           : isUrgent
                                           ? Colors.red.shade500
-                                          : Colors.blue.shade400,
+                                          : Colors.deepOrange.shade300,
                                 ),
                               ],
                             ),
@@ -798,7 +798,7 @@ class _Legend extends StatelessWidget {
           c,
         ),
         _legLine(Colors.blueAccent.shade400, 'Now', c),
-        _legLine(Colors.blue.shade400, 'Pickup deadline', c),
+        _legLine(Colors.deepOrange.shade300, 'Pickup deadline', c),
       ],
     );
   }

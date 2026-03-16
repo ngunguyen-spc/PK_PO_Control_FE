@@ -51,6 +51,7 @@ class _RemainTableDetailPopupState extends State<RemainTableDetailPopup> {
   // ── Column config: (label, jsonKey, isNumber) ────────────────────────────
   static const _colDefs = [
     ('SSD', 'ssd', false),
+    ('PickupTime', 'pickupTime', false),
     ('CusID', 'cusID', false),
     ('ShipBy', 'shipBy', false),
     ('DENK', 'denk', false),
@@ -68,6 +69,7 @@ class _RemainTableDetailPopupState extends State<RemainTableDetailPopup> {
   late List<double> _colWidths;
   static const _defaultWidths = [
     130.0, // SSD
+    160.0, // PickupTime
     100.0, // CusID
     90.0, // ShipBy
     80.0, // DENK
@@ -84,6 +86,7 @@ class _RemainTableDetailPopupState extends State<RemainTableDetailPopup> {
 
   // ── Filter state ──────────────────────────────────────────────────────────
   List<String>? selSsd;
+  List<String>? selPickupTime;
   List<String>? selCusID;
   List<String>? selShipBy;
   List<String>? selDenk;
@@ -132,22 +135,31 @@ class _RemainTableDetailPopupState extends State<RemainTableDetailPopup> {
     if (_selectedRows.isEmpty) return;
     final rows = _selectedRows.toList()..sort();
     final buf = StringBuffer();
-
-    // Header row
     buf.writeln(_colDefs.map((c) => c.$1).join('\t'));
-
-    // Data rows
     for (final i in rows) {
       final j = filteredData[i].toJson();
       buf.writeln(_colDefs.map((c) => (j[c.$2] ?? '').toString()).join('\t'));
     }
+    final text = buf.toString().trimRight();
 
-    await Clipboard.setData(ClipboardData(text: buf.toString().trimRight()));
+    try {
+      await Clipboard.setData(ClipboardData(text: text));
+    } catch (_) {
+      // Fallback cho web không có https
+      final ta = html.TextAreaElement()
+        ..value = text
+        ..style.position = 'fixed'
+        ..style.opacity = '0';
+      html.document.body!.append(ta);
+      ta.select();
+      html.document.execCommand('copy');
+      ta.remove();
+    }
+
     if (mounted) {
       setState(() => _isCopied = true);
-      Future.delayed(const Duration(seconds: 2), () {
-        if (mounted) setState(() => _isCopied = false);
-      });
+      Future.delayed(const Duration(seconds: 2),
+              () { if (mounted) setState(() => _isCopied = false); });
     }
   }
 
@@ -208,6 +220,7 @@ class _RemainTableDetailPopupState extends State<RemainTableDetailPopup> {
   // ── Filter helpers ────────────────────────────────────────────────────────
   bool _checkHasInput() =>
       selSsd != null ||
+      selPickupTime != null ||
       selCusID != null ||
       selShipBy != null ||
       selDenk != null ||
@@ -225,6 +238,8 @@ class _RemainTableDetailPopupState extends State<RemainTableDetailPopup> {
     switch (key) {
       case 'ssd':
         return selSsd ?? [];
+      case 'pickupTime':
+        return selPickupTime ?? [];
       case 'cusID':
         return selCusID ?? [];
       case 'shipBy':
@@ -257,6 +272,9 @@ class _RemainTableDetailPopupState extends State<RemainTableDetailPopup> {
     switch (key) {
       case 'ssd':
         selSsd = v;
+        break;
+      case 'pickupTime':
+        selPickupTime = v;
         break;
       case 'cusID':
         selCusID = v;
@@ -307,6 +325,7 @@ class _RemainTableDetailPopupState extends State<RemainTableDetailPopup> {
             if (tokens.isNotEmpty) {
               final searchable = [
                 'ssd',
+                'pickupTime',
                 'cusID',
                 'shipBy',
                 'denk',
@@ -338,6 +357,7 @@ class _RemainTableDetailPopupState extends State<RemainTableDetailPopup> {
     setState(() {
       _filterController.clear();
       selSsd =
+        selPickupTime =
           selCusID =
               selShipBy =
                   selDenk =
@@ -801,6 +821,7 @@ class _RemainTableDetailPopupState extends State<RemainTableDetailPopup> {
       height: 48,
       child: ClipRect(
         child: Stack(
+          clipBehavior: Clip.hardEdge,
           children: [
             // Dropdown filter
             Container(
@@ -889,7 +910,6 @@ class _RemainTableDetailPopupState extends State<RemainTableDetailPopup> {
               ),
             ),
           ],
-          clipBehavior: Clip.hardEdge,
         ),
       ),
     );
@@ -979,17 +999,18 @@ class _RemainTableDetailPopupState extends State<RemainTableDetailPopup> {
         child: Row(
           children: [
             txtCell('ssd', 0),
-            txtCell('cusID', 1),
-            txtCell('shipBy', 2),
-            txtCell('denk', 3),
-            txtCell('vbeln', 4),
-            txtCell('po', 5),
-            txtCell('div', 6),
-            txtCell('ferth', 7),
-            txtCell('roname', 8),
-            numCell('ex_Qty', d.exQty, 9),
-            numCell('fn_Qty', d.fnQty, 10),
-            numCell('remain_Qty', d.remainQty, 11),
+            txtCell('pickupTime', 1),
+            txtCell('cusID', 2),
+            txtCell('shipBy', 3),
+            txtCell('denk', 4),
+            txtCell('vbeln', 5),
+            txtCell('po', 6),
+            txtCell('div', 7),
+            txtCell('ferth', 8),
+            txtCell('roname', 9),
+            numCell('ex_Qty', d.exQty, 10),
+            numCell('fn_Qty', d.fnQty, 11),
+            numCell('remain_Qty', d.remainQty, 12),
           ],
         ),
       ),
@@ -1024,6 +1045,7 @@ class _RemainTableDetailPopupState extends State<RemainTableDetailPopup> {
     final sheet = excel['Sheet1'] as xl.Sheet;
     sheet.appendRow([
       'SSD',
+      'PickupTime',
       'CusID',
       'ShipBy',
       'DENK',
@@ -1040,6 +1062,7 @@ class _RemainTableDetailPopupState extends State<RemainTableDetailPopup> {
       final j = item.toJson();
       sheet.appendRow([
         j['ssd'],
+        j['pickupTime'],
         j['cusID'],
         j['shipBy'],
         j['denk'],

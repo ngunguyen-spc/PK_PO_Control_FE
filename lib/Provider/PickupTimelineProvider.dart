@@ -63,23 +63,44 @@ class PickupTimelineProvider with ChangeNotifier {
     notifyListeners();
 
     final result = await _apiService.fetchPickupTimeline(div, date);
-    // result.sort((a, b) => a.pickupTime.compareTo(b.pickupTime));
 
-    _data           = result;
+    // ✅ So sánh data — chỉ update nếu thực sự thay đổi
+    final hasChanged = _dataHasChanged(result);
+
     _lastLoadedDiv  = div;
     _lastLoadedDate = date;
     _isLoading      = false;
     notifyListeners();
 
-    // ✅ Sau khi có summary → preload toàn bộ detail vào cache ngầm
-    _prefetchDetail(div, date);
+    // ✅ Chỉ update _data và re-render nếu data thực sự thay đổi
+    if (_dataHasChanged(result)) {
+      _data = result;
+      debugPrint('[${DateTime.now()}] [PickupTimeline] Data changed → notifyListeners');
+      _prefetchDetail(div, date); // reload detail cache khi data mới
+    } else {
+      debugPrint('[${DateTime.now()}] [PickupTimeline] Data unchanged → skip re-render');
+    }
+
+    notifyListeners(); // luôn gọi 1 lần để tắt loading spinner
+  }
+
+  bool _dataHasChanged(List<PickupTimelineModel> newData) {
+    if (newData.length != _data.length) return true;
+    final oldSum = _data.fold<double>(0, (s, e) => s + e.remainPO);
+    final newSum = newData.fold<double>(0, (s, e) => s + e.remainPO);
+    if (oldSum != newSum) return true;
+    for (int i = 0; i < newData.length; i++) {
+      if (newData[i].cusID != _data[i].cusID ||
+          newData[i].remainPO != _data[i].remainPO) return true;
+    }
+    return false;
   }
 
   // ── Prefetch all detail, group by cusID|shipBy ───────────────────────────
   Future<void> _prefetchDetail(String div, String date) async {
     if (_isDetailLoading) return;
     _isDetailLoading = true;
-    debugPrint('[Cache] Prefetching detail — div=$div date=$date');
+    debugPrint('[${DateTime.now()}] [Cache] Prefetching detail — div=$div date=$date');
 
     try {
       final all = await _apiService.fetchRemainTableDetailMTD(div, date, 'All', 'All');
@@ -92,9 +113,9 @@ class PickupTimelineProvider with ChangeNotifier {
       grouped['All|All'] = all; // cho click ô tổng
 
       _detailCache = grouped;
-      debugPrint('[Cache] Done — ${all.length} rows, ${grouped.length} keys');
+      debugPrint('[${DateTime.now()}] [Cache] Done — ${all.length} rows, ${grouped.length} keys');
     } catch (e) {
-      debugPrint('[Cache] Prefetch failed: $e');
+      debugPrint('[${DateTime.now()}] [Cache] Prefetch failed: $e');
     } finally {
       _isDetailLoading = false;
       notifyListeners();

@@ -1,5 +1,6 @@
 class RemainTableDetailModel {
   final String ssd;
+  final String pickupTime;
   final String cusID;
   final String shipBy;
   final String denk;
@@ -15,6 +16,7 @@ class RemainTableDetailModel {
 
   RemainTableDetailModel({
     required this.ssd,
+    required this.pickupTime,
     required this.cusID,
     required this.shipBy,
     required this.denk,
@@ -31,6 +33,7 @@ class RemainTableDetailModel {
   factory RemainTableDetailModel.fromJson(Map<String, dynamic> json) {
     return RemainTableDetailModel(
       ssd: json['ssd'] ?? '',
+      pickupTime: json['pickupTime'] ?? '',
       cusID: json['cusID'] ?? '',
       shipBy: json['shipBy'] ?? '',
       denk: json['denk'] ?? '',
@@ -48,6 +51,7 @@ class RemainTableDetailModel {
   Map<String, dynamic> toJson() {
     return {
       'ssd': ssd,
+      'pickupTime': pickupTime,
       'cusID': cusID,
       'shipBy': shipBy,
       'denk': denk,
@@ -64,6 +68,7 @@ class RemainTableDetailModel {
 
   RemainTableDetailModel copyWith({
     String? ssd,
+    String? pickupTime,
     String? cusID,
     String? shipBy,
     String? denk,
@@ -78,6 +83,7 @@ class RemainTableDetailModel {
   }) {
     return RemainTableDetailModel(
       ssd: ssd ?? this.ssd,
+      pickupTime: pickupTime ?? this.pickupTime,
       cusID: cusID ?? this.cusID,
       shipBy: shipBy ?? this.shipBy,
       denk: denk ?? this.denk,
