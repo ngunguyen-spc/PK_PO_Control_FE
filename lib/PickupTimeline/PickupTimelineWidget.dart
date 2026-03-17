@@ -285,7 +285,7 @@ class PickupTimeAxis extends StatelessWidget {
                         'Now',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 13,
                           fontWeight: FontWeight.w700,
                           color: Colors.blueAccent.shade400,
                         ),
