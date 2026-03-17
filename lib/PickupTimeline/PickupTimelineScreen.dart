@@ -155,7 +155,7 @@ class _PickupTimelineScreenState extends State<PickupTimelineScreen> {
                         TextSpan(
                           text: 'Remain',
                           style: TextStyle(
-                            fontSize: 10,
+                            fontSize: 13,
                             fontWeight: FontWeight.w600,
                             color: isDark ? Colors.grey.shade300 : Colors.grey.shade700,
                           ),
@@ -163,7 +163,7 @@ class _PickupTimelineScreenState extends State<PickupTimelineScreen> {
                         TextSpan(
                           text: ' / Total',
                           style: TextStyle(
-                            fontSize: 10,
+                            fontSize: 13,
                             color: Colors.grey.shade500,
                           ),
                         ),

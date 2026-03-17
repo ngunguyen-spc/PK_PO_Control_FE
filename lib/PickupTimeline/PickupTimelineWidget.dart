@@ -745,9 +745,9 @@ class _RemainChip extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            NumberFormat('#,###').format(remain.toInt()),
+            NumberFormat('#,###').format(remain.toInt()),  ///Remain/TTL @@
             style: TextStyle(
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
               color: textC,
             ),
@@ -756,7 +756,7 @@ class _RemainChip extends StatelessWidget {
           Text(
             '/ ${NumberFormat('#,###').format(total.toInt())}',
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 14,
               color:
                   isDark ? Colors.grey.shade500 : Colors.grey.shade700,
             ),
