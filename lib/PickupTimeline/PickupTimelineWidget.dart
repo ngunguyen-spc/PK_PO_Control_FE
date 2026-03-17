@@ -109,26 +109,6 @@ class _PickupTimelineWidgetState extends State<PickupTimelineWidget>
   ) {
     final rows = <Widget>[];
 
-    // ✅ Header label cho cột stat
-    // rows.add(Row(children: [
-    //   SizedBox(width: _labelW),
-    //   Expanded(child: SizedBox.shrink()),
-    //   const SizedBox(width: 8),
-    //   SizedBox(
-    //     width: _statW,
-    //     child: Center(
-    //       child: Text(
-    //         'Remain / Total',
-    //         style: TextStyle(
-    //           fontSize: 10,
-    //           color: isDark ? Colors.grey.shade500 : Colors.grey.shade500,
-    //         ),
-    //       ),
-    //     ),
-    //   ),
-    // ]));
-    // rows.add(const SizedBox(height: 4));
-
     for (int i = 0; i < widget.data.length; i++) {
       final item = widget.data[i];
       if (i > 0 && widget.data[i - 1].shipBy != item.shipBy) {
