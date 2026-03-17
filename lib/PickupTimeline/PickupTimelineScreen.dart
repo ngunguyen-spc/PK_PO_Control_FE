@@ -134,9 +134,45 @@ class _PickupTimelineScreenState extends State<PickupTimelineScreen> {
               .clamp(0.0, 1.0);
 
           // Axis widget — dùng chung cho inline + sticky
-          Widget axisWidget = PickupTimeAxis(
-            start: rangeStart, end: rangeEnd, totalMs: totalMs,
-            nowPct: nowPct, labelW: 148, statW: 90, isDark: isDark,
+          // Widget axisWidget = PickupTimeAxis(
+          //   start: rangeStart, end: rangeEnd, totalMs: totalMs,
+          //   nowPct: nowPct, labelW: 148, statW: 90, isDark: isDark,
+          // );
+          Widget axisWidget = Row(
+            children: [
+              Expanded(
+                child: PickupTimeAxis(
+                  start: rangeStart, end: rangeEnd, totalMs: totalMs,
+                  nowPct: nowPct, labelW: 148, statW: 0, isDark: isDark,
+                ),
+              ),
+              SizedBox(
+                width: 90 + 8,  // statW + SizedBox(8) của GanttRow
+                child: Center(
+                  child: RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: 'Remain',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? Colors.grey.shade300 : Colors.grey.shade700,
+                          ),
+                        ),
+                        TextSpan(
+                          text: ' / Total',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.grey.shade500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           );
 
           return Column(children: [

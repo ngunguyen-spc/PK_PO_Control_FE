@@ -108,6 +108,27 @@ class _PickupTimelineWidgetState extends State<PickupTimelineWidget>
     double nowPct,
   ) {
     final rows = <Widget>[];
+
+    // ✅ Header label cho cột stat
+    // rows.add(Row(children: [
+    //   SizedBox(width: _labelW),
+    //   Expanded(child: SizedBox.shrink()),
+    //   const SizedBox(width: 8),
+    //   SizedBox(
+    //     width: _statW,
+    //     child: Center(
+    //       child: Text(
+    //         'Remain / Total',
+    //         style: TextStyle(
+    //           fontSize: 10,
+    //           color: isDark ? Colors.grey.shade500 : Colors.grey.shade500,
+    //         ),
+    //       ),
+    //     ),
+    //   ),
+    // ]));
+    // rows.add(const SizedBox(height: 4));
+
     for (int i = 0; i < widget.data.length; i++) {
       final item = widget.data[i];
       if (i > 0 && widget.data[i - 1].shipBy != item.shipBy) {
@@ -650,7 +671,7 @@ class _GanttRow extends StatelessWidget {
                         ? _DoneChip(isDark: isDark)
                         : _RemainChip(
                           remain: item.remainPO,
-                          pct: item.remPct,
+                          total: item.exPO,
                           isUrgent: isUrgent,
                           isOverdue: isOverdue,
                           isDark: isDark,
@@ -705,12 +726,12 @@ class _DoneChip extends StatelessWidget {
 }
 
 class _RemainChip extends StatelessWidget {
-  final double remain, pct;
+  final double remain, total;
   final bool isUrgent, isOverdue, isDark;
 
   const _RemainChip({
     required this.remain,
-    required this.pct,
+    required this.total,
     required this.isUrgent,
     required this.isOverdue,
     required this.isDark,
@@ -753,13 +774,11 @@ class _RemainChip extends StatelessWidget {
           ),
           const SizedBox(width: 4),
           Text(
-            '${(pct * 100).toStringAsFixed(0)}%',
+            '/ ${NumberFormat('#,###').format(total.toInt())}',
             style: TextStyle(
               fontSize: 12,
               color:
-                  isOverdue
-                      ? Colors.deepOrange.shade400
-                      : (isDark ? AppColors.remainDark : AppColors.remainLight),
+                  isDark ? Colors.grey.shade500 : Colors.grey.shade700,
             ),
           ),
         ],
