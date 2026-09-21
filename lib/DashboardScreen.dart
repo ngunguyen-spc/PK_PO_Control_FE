@@ -23,19 +23,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final dateProvider   = context.watch<DateProvider>();
-    final remainProvider = context.watch<RemainTableProvider>();
+    // ✅ Chỉ rebuild khi selectedDate thay đổi (không rebuild khi provider khác notify)
+    final selectedDate = context.select<DateProvider, DateTime>((p) => p.selectedDate);
+    final lastLoadedTime = context.select<RemainTableProvider, DateTime?>((p) => p.lastLoadedTime);
+    final lastReloadTriggeredAt = context.select<RemainTableProvider, DateTime?>((p) => p.lastReloadTriggeredAt);
 
     return Scaffold(
       appBar: CustomAppBar(
         titleText: "Packing PO Monitoring",
-        selectedDate: dateProvider.selectedDate,
+        selectedDate: selectedDate,
         onDateChanged: (newDate) {
           context.read<DateProvider>().updateDate(newDate);
         },
         currentDate: DateTime.now(),
-        lastLoadedTime:        remainProvider.lastLoadedTime,
-        lastReloadTriggeredAt: remainProvider.lastReloadTriggeredAt,
+        lastLoadedTime:        lastLoadedTime,
+        lastReloadTriggeredAt: lastReloadTriggeredAt,
         onToggleTheme: widget.onToggleTheme,
         selectedDiv: _selectedDiv,
         onDivChanged: (div) {
@@ -46,9 +48,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         children: [
           OverviewCard(
           child: PickupTimelineScreen(
-            // child: RemainTableScreen(
               onToggleTheme: widget.onToggleTheme,
-              selectedDate: dateProvider.selectedDate,
+              selectedDate: selectedDate,
               div: _selectedDiv,
             ),
           ),
@@ -58,7 +59,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: OverviewCard(
                   child: RemainTableScreen(
                     onToggleTheme: widget.onToggleTheme,
-                    selectedDate: dateProvider.selectedDate,
+                    selectedDate: selectedDate,
                     div: _selectedDiv,
                   ),
                 ),
@@ -67,7 +68,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: OverviewCard(
                   child: RemainChartScreen(
                     onToggleTheme: widget.onToggleTheme,
-                    selectedDate: dateProvider.selectedDate,
+                    selectedDate: selectedDate,
                     div: _selectedDiv,
                   ),
                 ),

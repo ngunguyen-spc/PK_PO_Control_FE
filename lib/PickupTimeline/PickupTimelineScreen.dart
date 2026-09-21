@@ -70,20 +70,39 @@ class _PickupTimelineScreenState extends State<PickupTimelineScreen> {
     super.dispose();
   }
 
+  // void _onRowTap(PickupTimelineModel item) {
+  //   final provider = context.read<PickupTimelineProvider>();
+  //
+  //   showDialog(
+  //     context: context,
+  //     builder: (_) => RemainTableDetailPopup(
+  //       nameChart: 'Pickup Timeline',
+  //       title: '${item.cusID} — ${item.shipBy}',
+  //       data:   provider.getDetail(item.cusID, item.shipBy),   // PO
+  //       dataID: provider.getDetailID(item.cusID, item.shipBy), // ← thêm ID
+  //       div: widget.div,
+  //       cusID: item.cusID,
+  //       shipBy: item.shipBy,
+  //       //initialDate: context.read<DateProvider>().selectedDate,  // ← thêm nếu popup có field này
+  //     ),
+  //   );
+  // }
   void _onRowTap(PickupTimelineModel item) {
-    final provider = context.read<PickupTimelineProvider>();
-    final cachedData = provider.getDetail(item.cusID, item.shipBy);
+    final provider     = context.read<PickupTimelineProvider>();
+    final dateProvider = context.read<DateProvider>();
+    final date         = DateFormat('yyyy-MM-dd').format(dateProvider.selectedDate);
 
     showDialog(
       context: context,
       builder: (_) => RemainTableDetailPopup(
         nameChart: 'Pickup Timeline',
-        title: '${item.cusID} — ${item.shipBy}',
-        data: cachedData,          // ← lấy từ cache
-        div: widget.div,
-        cusID: item.cusID,
-        shipBy: item.shipBy,
-        //initialDate: context.read<DateProvider>().selectedDate,  // ← thêm nếu popup có field này
+        title:     '${item.cusID} — ${item.shipBy}',
+        data:      provider.getDetail(item.cusID, item.shipBy),
+        dataID:    provider.getDetailID(item.cusID, item.shipBy),
+        div:       widget.div,
+        date:      date,   // ✅ thêm vào
+        cusID:     item.cusID,
+        shipBy:    item.shipBy,
       ),
     );
   }
@@ -300,7 +319,7 @@ class _Chip extends StatelessWidget {
     } else if (highlightRed) {
       bg     = isDark ? AppColors.remainBgDark.withOpacity(0.15) : AppColors.remainBgLight;
       border = AppColors.remainBorderDark;
-      textC  = Colors.pink.shade50;
+      textC  = isDark ? AppColors.remainDark : AppColors.remainLight;
     } else {
       bg     = isDark ? Colors.grey.shade800 : Colors.grey.shade100;
       border = isDark ? Colors.grey.shade600 : Colors.grey.shade300;

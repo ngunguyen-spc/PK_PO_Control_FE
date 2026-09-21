@@ -14,10 +14,9 @@ void main() {
         ChangeNotifierProvider(create: (_) => RemainTableProvider()),
         ChangeNotifierProvider(create: (_) => RemainChartProvider()),
         ChangeNotifierProvider(create: (_) => PickupTimelineProvider()),
-
         ChangeNotifierProvider(create: (_) => DateProvider()),
       ],
-      child: DashboardApp(),
+      child: const DashboardApp(),
     ),
   );
 }
@@ -30,7 +29,16 @@ class DashboardApp extends StatefulWidget {
 }
 
 class _DashboardAppState extends State<DashboardApp> {
-  bool isDarkMode = true; // 🔥 Mặc định bật chế độ tối
+  late bool isDarkMode;
+  late final router = createRouter(_toggleTheme); // ✅ Tạo 1 lần duy nhất
+
+  @override
+  void initState() {
+    super.initState();
+    // Mặc định dark. Web ngoài muốn theme light thì gọi kèm ?theme=light
+    final themeParam = Uri.base.queryParameters['theme']?.toLowerCase();
+    isDarkMode = themeParam != 'light';
+  }
 
   void _toggleTheme() {
     setState(() {
@@ -40,10 +48,8 @@ class _DashboardAppState extends State<DashboardApp> {
 
   @override
   Widget build(BuildContext context) {
-    final router = createRouter(_toggleTheme); // Tạo router mới với chế độ tối
     return MaterialApp.router(
       routerConfig: router,
-      // Cấu hình router cho MaterialApp
       title: 'Packing PO Monitoring',
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark().copyWith(

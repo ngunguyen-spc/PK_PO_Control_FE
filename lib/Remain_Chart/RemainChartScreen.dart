@@ -268,6 +268,7 @@ class _RemainChartScreenState extends State<RemainChartScreen> {
     }
   }
 
+
   void _fetchData(RemainChartProvider provider) {
     final dateProvider = context.read<DateProvider>();
     final date = DateFormat('yyyy-MM-dd').format(dateProvider.selectedDate);

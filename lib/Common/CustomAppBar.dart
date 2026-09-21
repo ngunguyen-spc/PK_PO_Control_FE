@@ -58,6 +58,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
   @override
   Widget build(BuildContext context) {
     final dayFormat = DateFormat('d/MMM/yyyy');
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return AppBar(
       elevation: 4,
@@ -102,7 +103,9 @@ class _CustomAppBarState extends State<CustomAppBar> {
                           color: isSelected ? divColor : Colors.transparent,
                           borderRadius: BorderRadius.circular(6),
                           border: Border.all(
-                            color: isSelected ? divColor : Colors.grey.shade600,
+                            color: isSelected
+                                ? divColor
+                                : (isDark ? Colors.grey.shade600 : Colors.grey.shade400),
                           ),
                         ),
                         child: Text(
@@ -110,7 +113,9 @@ class _CustomAppBarState extends State<CustomAppBar> {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                            color: isSelected ? Colors.white : Colors.grey.shade400,
+                            color: isSelected
+                                ? Colors.white
+                                : (isDark ? Colors.grey.shade400 : Colors.grey.shade700),
                           ),
                         ),
                       ),
@@ -197,8 +202,8 @@ class _ReloadTimeWidgetState extends State<_ReloadTimeWidget> {
     final isDark = Theme
         .of(context)
         .brightness == Brightness.dark;
-    final textColor = isDark ? Colors.grey.shade300 : Colors.grey.shade200;
-    final subColor = isDark ? Colors.grey.shade500 : Colors.grey.shade400;
+    final textColor = isDark ? Colors.grey.shade300 : Colors.grey.shade800;
+    final subColor = isDark ? Colors.grey.shade500 : Colors.grey.shade600;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),

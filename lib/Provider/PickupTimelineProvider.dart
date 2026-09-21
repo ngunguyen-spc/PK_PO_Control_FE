@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:ma_visualization/API/ApiService.dart';
 import 'package:ma_visualization/Model/PickupTimelineModel.dart';
 
+import '../Model/RemainTableDetailIDModel.dart';
 import '../Model/RemainTableDetailModel.dart';
 
 class PickupTimelineProvider with ChangeNotifier {
@@ -20,13 +21,28 @@ class PickupTimelineProvider with ChangeNotifier {
   DateTime _lastReloadTriggeredAt = DateTime.now();
   Timer? _timer;
 
-  // ── Detail cache ────────────────────────────────────────────────────────
+  // ── Cache PO  ────────────────────────────────────────────────────────────
   Map<String, List<RemainTableDetailModel>> _detailCache = {};
   bool _isDetailLoading = false;
   bool get isDetailReady => _detailCache.isNotEmpty;
 
   List<RemainTableDetailModel> getDetail(String cusID, String shipBy) =>
       _detailCache['$cusID|$shipBy'] ?? [];
+
+  // ── Cache ID ──────────────────────────────────────────────────────────────
+  Map<String, List<RemainTableDetailIDModel>> _detailCacheID = {};
+  bool _isDetailIDLoading = false;
+
+  List<RemainTableDetailIDModel> getDetailID(String cusID, String shipBy) {
+    const allKey = 'All|All';
+    if (!_detailCacheID.containsKey(allKey)) return [];
+    if (cusID == 'All' && shipBy == 'All') return _detailCacheID[allKey]!;
+    final poRows   = _detailCache['$cusID|$shipBy'] ?? [];
+    final vbelnSet = poRows.map((r) => r.vbeln).toSet();
+    return _detailCacheID[allKey]!
+        .where((r) => vbelnSet.contains(r.vbeln))
+        .toList();
+  }
 
   List<PickupTimelineModel> get data        => _data;
   bool get isLoading    => _isLoading && _data.isEmpty;
@@ -64,15 +80,11 @@ class PickupTimelineProvider with ChangeNotifier {
 
     final result = await _apiService.fetchPickupTimeline(div, date);
 
-    // ✅ So sánh data — chỉ update nếu thực sự thay đổi
-    final hasChanged = _dataHasChanged(result);
-
     _lastLoadedDiv  = div;
     _lastLoadedDate = date;
     _isLoading      = false;
-    notifyListeners();
 
-    // ✅ Chỉ update _data và re-render nếu data thực sự thay đổi
+    // ✅ So sánh data — chỉ update + prefetch nếu thực sự thay đổi
     if (_dataHasChanged(result)) {
       _data = result;
       debugPrint('[${DateTime.now()}] [PickupTimeline] Data changed → notifyListeners');
@@ -81,7 +93,7 @@ class PickupTimelineProvider with ChangeNotifier {
       debugPrint('[${DateTime.now()}] [PickupTimeline] Data unchanged → skip re-render');
     }
 
-    notifyListeners(); // luôn gọi 1 lần để tắt loading spinner
+    notifyListeners(); // 1 lần duy nhất để tắt loading spinner
   }
 
   bool _dataHasChanged(List<PickupTimelineModel> newData) {
@@ -110,7 +122,7 @@ class PickupTimelineProvider with ChangeNotifier {
         final key = '${row.cusID}|${row.shipBy}';
         grouped.putIfAbsent(key, () => []).add(row);
       }
-      grouped['All|All'] = all; // cho click ô tổng
+      grouped['All|All'] = all;
 
       _detailCache = grouped;
       debugPrint('[${DateTime.now()}] [Cache] Done — ${all.length} rows, ${grouped.length} keys');
@@ -127,6 +139,7 @@ class PickupTimelineProvider with ChangeNotifier {
     _lastLoadedDiv  = null;
     _lastLoadedDate = null;
     _detailCache    = {};
+    _detailCacheID  = {};
     notifyListeners();
   }
 }
